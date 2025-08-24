@@ -12,12 +12,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@asafarim/display-code": "file:../",
+    "@asafarim/shared": "^1.7.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@asafarim/shared": "^1.0.3",
-    "@asafarim/display-code": "file:../"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@asafarim/react-themes": "^1.6.1",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.0.3",

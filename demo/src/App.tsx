@@ -2,6 +2,7 @@ import { useState } from "react";
 // Use our professional DisplayCodeDemo component
 import { DisplayCode } from "@asafarim/display-code";
 import { PackageLinks } from "@asafarim/shared";
+import { useTheme, ThemeToggle } from '@asafarim/react-themes';
 
 const codeExamples = {
   javascript: `// JavaScript Example
@@ -458,7 +459,8 @@ main "\$@"`,
 };
 
 function App() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const { mode, currentTheme, toggleMode } = useTheme();
+
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [showLineNumbers, setShowLineNumbers] = useState(true);
   const [showCopyButton, setShowCopyButton] = useState(true);
@@ -490,7 +492,7 @@ function App() {
   };
 
   return (
-    <div className={`demo-container ${theme === "dark" ? "dark-theme" : ""}`}>
+    <div className={`demo-container ${currentTheme.mode === "dark" ? "dark-theme" : ""}`}>
       <div className="demo-header">
         <div className="logo-container">
           <img src="./logo.svg" alt="Display Code Logo" className="demo-logo" />
@@ -505,8 +507,8 @@ function App() {
         />
 
         <div className="theme-toggle">
-          <button onClick={toggleTheme}>
-            Switch to {theme === "light" ? "Dark" : "Light"} Theme
+          <button onClick={ toggleMode}>
+            Switch to {currentTheme.mode === "light" ? "Dark" : "Light"} Theme
           </button>
         </div>
       </div>
@@ -626,7 +628,7 @@ function App() {
         <DisplayCode
           code={codeExamples[selectedLanguage as keyof typeof codeExamples]}
           language={selectedLanguage as any}
-          theme={theme}
+          theme={currentTheme.mode}
           title={`${
             selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)
           } Example`}
@@ -658,7 +660,7 @@ import { DisplayCode } from '@asafarim/display-code';
   showLineNumbers={true}
 />`}
             language="jsx"
-            theme={theme}
+            theme={currentTheme.mode}
             title="Basic Usage"
             showLineNumbers={true}
             fontSize="small"
@@ -682,7 +684,7 @@ import { DisplayCode } from '@asafarim/display-code';
   transform: translateY(-2px);
 }`}
             language="css"
-            theme={theme}
+            theme={currentTheme.mode}
             title="CSS Styling"
             showLineNumbers={true}
             fontSize="small"
@@ -703,7 +705,7 @@ import { DisplayCode } from '@asafarim/display-code';
   return important;
 }`}
               language="javascript"
-              theme={theme}
+              theme={currentTheme.mode}
               showLineNumbers={true}
               highlightLines={[2]}
               title="Highlighted Lines Demo"
@@ -722,7 +724,7 @@ def process_data(data):
             result.append(item.transform())
     return result`}
               language="python"
-              theme={theme}
+              theme={currentTheme.mode}
               showLineNumbers={true}
               startLineNumber={50}
               title="Custom Line Numbers"
@@ -744,7 +746,7 @@ yarn add @asafarim/display-code
 # Or with pnpm
 pnpm add @asafarim/display-code`}
           language="bash"
-          theme={theme}
+          theme={currentTheme.mode}
           title="Installation"
           showCopyButton={true}
         />
@@ -772,7 +774,7 @@ function greet(name) {
   );
 }`}
           language="jsx"
-          theme={theme}
+          theme={currentTheme.mode}
           title="React Usage Example"
           showLineNumbers={true}
           showCopyButton={true}
@@ -783,7 +785,7 @@ function greet(name) {
         <p
           style={{
             fontSize: "1.1rem",
-            color: theme === "dark" ? "#a0aec0" : "#4a5568",
+            color: currentTheme.mode === "dark" ? "#a0aec0" : "#4a5568",
           }}
         >
           Built with ❤️ by Ali Safari
