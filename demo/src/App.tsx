@@ -2,7 +2,7 @@ import { useState } from "react";
 // Use our professional DisplayCodeDemo component
 import { DisplayCode } from "@asafarim/display-code";
 import { PackageLinks } from "@asafarim/shared";
-import { useTheme, ThemeToggle } from '@asafarim/react-themes';
+import { useTheme, ThemeToggle } from "@asafarim/react-themes";
 
 const codeExamples = {
   javascript: `// JavaScript Example
@@ -492,7 +492,11 @@ function App() {
   };
 
   return (
-    <div className={`demo-container ${currentTheme.mode === "dark" ? "dark-theme" : ""}`}>
+    <div
+      className={`demo-container ${
+        currentTheme.mode === "dark" ? "dark-theme" : ""
+      }`}
+    >
       <div className="demo-header">
         <div className="logo-container">
           <img src="./logo.svg" alt="Display Code Logo" className="demo-logo" />
@@ -502,14 +506,13 @@ function App() {
 
         <PackageLinks
           packageName="@asafarim/display-code"
-          githubPath="packages/display-code"
-          demoPath="packages/display-code"
+          githubPath="https://github.com/AliSafari-IT/display-code.git"
+          demoPath="display-code"
         />
-
-        <div className="theme-toggle">
-          <button onClick={ toggleMode}>
-            Switch to {currentTheme.mode === "light" ? "Dark" : "Light"} Theme
-          </button>
+        <br />
+        <div style={{display: "flex", alignItems: "center", gap: "1rem", justifyContent: "center"}}>
+          <p style={{margin: "0"}}>Theme Toggle:</p>
+          <ThemeToggle showLabels style={{border: "none", background: "transparent", borderRadius: "5px", padding: "0.5rem", cursor: "pointer", transition: "background 0.3s ease"}}/>
         </div>
       </div>
 
