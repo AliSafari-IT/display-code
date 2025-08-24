@@ -1,6 +1,6 @@
 {
   "name": "display-code-demo",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "Demo for the @asafarim/display-code component",

@@ -512,7 +512,7 @@ function App() {
         <br />
         <div style={{display: "flex", alignItems: "center", gap: "1rem", justifyContent: "center"}}>
           <p style={{margin: "0"}}>Theme Toggle:</p>
-          <ThemeToggle showLabels style={{border: "none", background: "transparent", borderRadius: "5px", padding: "0.5rem", cursor: "pointer", transition: "background 0.3s ease"}}/>
+          <ThemeToggle showLabels style={{border: "1px solid #ccc", background: "transparent", borderRadius: "5px", padding: "0.5rem", cursor: "pointer", transition: "background 0.3s ease"}}/>
         </div>
       </div>
 
