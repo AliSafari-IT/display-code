@@ -4,9 +4,9 @@ A React component for displaying syntax-highlighted code blocks with copy functi
 
 ## 🚀 Demo
 
-![DisplayCode Demo Screenshot](demo/public/DisplayCode_Demo-and-Usage-Examples.png)
+![DisplayCode_Demo-and-Usage-Examples](demo/public/DisplayCode_Demo-and-Usage-Examples.png)
 
-Experience the full power of the DisplayCode component with our [interactive demo](https://alisafari-it.github.io/asafarim-webapp/packages/display-code/).
+Experience the full power of the DisplayCode component with our [interactive demo](https://alisafari-it.github.io/display-code/).
 
 To run the demo locally:
 
@@ -317,4 +317,4 @@ npm run demo
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see our [Contributing Guide](../../CONTRIBUTING.md) for details.
+Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
