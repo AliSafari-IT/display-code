@@ -1,292 +1,14 @@
-// Professional implementation of DisplayCode for the demo
 import React, { useState, useEffect, useMemo } from 'react';
-
-// Types
-export interface DisplayCodeProps {
-  code: string;
-  language?: string;
-  theme?: 'light' | 'dark' | 'auto';
-  showLineNumbers?: boolean;
-  showCopyButton?: boolean;
-  title?: string;
-  maxHeight?: string;
-  wrapLines?: boolean;
-  className?: string;
-  onCopy?: (code: string) => void;
-  fontSize?: 'small' | 'medium' | 'large';
-  highlightLines?: number[];
-  startLineNumber?: number;
-  tabSize?: number;
-  showLanguageLabel?: boolean;
-}
-
-export type SupportedLanguage = 
-  | 'javascript'
-  | 'typescript'
-  | 'jsx'
-  | 'tsx'
-  | 'html'
-  | 'css'
-  | 'json'
-  | 'markdown'
-  | 'bash'
-  | 'python'
-  | 'java'
-  | 'cpp'
-  | 'sql'
-  | 'yaml'
-  | 'xml'
-  | 'plaintext';
-
-// Utility functions
-const copyToClipboard = async (text: string): Promise<boolean> => {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (err) {
-    console.error('Failed to copy text: ', err);
-    return false;
-  }
-};
-
-const getLanguageIcon = (language: string): string => {
-  const icons: Record<string, string> = {
-    javascript: '🟨',
-    typescript: '🔷',
-    jsx: '⚛️',
-    tsx: '⚛️',
-    html: '🌐',
-    css: '🎨',
-    json: '📋',
-    markdown: '📝',
-    bash: '💻',
-    python: '🐍',
-    java: '☕',
-    cpp: '⚙️',
-    sql: '🗄️',
-    yaml: '📄',
-    xml: '📑',
-    plaintext: '📃',
-  };
-  
-  return icons[language.toLowerCase()] || '📄';
-};
-
-// Tokenize code for syntax highlighting
-interface Token {
-  type: string;
-  content: string;
-}
-
-const tokenizeCode = (code: string, language: string): Token[] => {
-  // Special handling for JSON
-  if (language.toLowerCase() === 'json') {
-    return tokenizeJson(code);
-  }
-  
-  // Define patterns for different languages
-  const patterns: Record<string, Array<{ pattern: RegExp, type: string }>> = {
-    javascript: [
-      { pattern: /(\/\/.*|\/\*[\s\S]*?\*\/)/g, type: 'comment' },
-      { pattern: /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|async|await)\b/g, type: 'keyword' },
-      { pattern: /\b(true|false|null|undefined|NaN|Infinity)\b/g, type: 'builtin' },
-      { pattern: /(".*?"|'.*?'|`[\s\S]*?`)/g, type: 'string' },
-      { pattern: /\b(\d+(\.\d+)?)\b/g, type: 'number' },
-    ],
-    typescript: [
-      { pattern: /(\/\/.*|\/\*[\s\S]*?\*\/)/g, type: 'comment' },
-      { pattern: /\b(const|let|var|function|return|if|else|for|while|class|interface|type|import|export|from|async|await)\b/g, type: 'keyword' },
-      { pattern: /\b(true|false|null|undefined|NaN|Infinity)\b/g, type: 'builtin' },
-      { pattern: /(".*?"|'.*?'|`[\s\S]*?`)/g, type: 'string' },
-      { pattern: /\b(\d+(\.\d+)?)\b/g, type: 'number' },
-    ],
-    python: [
-      { pattern: /#.*/g, type: 'comment' },
-      { pattern: /"""[\s\S]*?"""|'''[\s\S]*?'''/g, type: 'comment' },
-      { pattern: /\b(def|class|if|elif|else|for|while|return|import|from|as|try|except|finally|with|lambda|None|True|False)\b/g, type: 'keyword' },
-      { pattern: /\b(self|print|len|range|int|str|list|dict|set|tuple)\b/g, type: 'builtin' },
-      { pattern: /(".*?"|'.*?')/g, type: 'string' },
-      { pattern: /\b(\d+(\.\d+)?)\b/g, type: 'number' },
-    ],
-    jsx: [
-      { pattern: /(\/\/.*|\/\*[\s\S]*?\*\/)/g, type: 'comment' },
-      { pattern: /\b(const|let|var|function|return|if|else|for|while|class|import|export|from|async|await)\b/g, type: 'keyword' },
-      { pattern: /\b(true|false|null|undefined|NaN|Infinity)\b/g, type: 'builtin' },
-      { pattern: /<\/?[a-zA-Z][a-zA-Z0-9]*(?:\s+[a-zA-Z][a-zA-Z0-9]*=".*?")*\s*\/?>/g, type: 'keyword' },
-      { pattern: /(".*?"|'.*?'|`[\s\S]*?`)/g, type: 'string' },
-      { pattern: /\b(\d+(\.\d+)?)\b/g, type: 'number' },
-    ],
-    // Add more languages as needed
-  };
-  
-  // Default to javascript patterns if language not found
-  const rules = patterns[language.toLowerCase()] || patterns.javascript;
-  
-  // Use the character-by-character tokenization approach for all languages
-  return tokenizeGeneric(code, rules);
-};
-
-// Generic tokenizer for all languages
-const tokenizeGeneric = (code: string, rules: Array<{ pattern: RegExp, type: string }>): Token[] => {
-  const tokens: Token[] = [];
-  let remainingCode = code;
-  
-  while (remainingCode.length > 0) {
-    let matchFound = false;
-    
-    // Try to match each pattern
-    for (const { pattern, type } of rules) {
-      // Reset the regex lastIndex to ensure we start from the beginning
-      pattern.lastIndex = 0;
-      
-      const match = pattern.exec(remainingCode);
-      if (match && match.index === 0) {
-        // Found a match at the start of the remaining code
-        tokens.push({ type, content: match[0] });
-        remainingCode = remainingCode.substring(match[0].length);
-        matchFound = true;
-        break;
-      }
-    }
-    
-    // If no pattern matched, take one character as plain text
-    if (!matchFound) {
-      // Find the next potential pattern match
-      let nextMatchIndex = remainingCode.length;
-      
-      for (const { pattern } of rules) {
-        pattern.lastIndex = 0;
-        const match = pattern.exec(remainingCode);
-        if (match && match.index > 0 && match.index < nextMatchIndex) {
-          nextMatchIndex = match.index;
-        }
-      }
-      
-      // Take everything up to the next match (or one character if no match)
-      const plainText = remainingCode.substring(0, Math.max(1, nextMatchIndex));
-      tokens.push({ type: 'plain', content: plainText });
-      remainingCode = remainingCode.substring(plainText.length);
-    }
-  }
-  
-  return tokens;
-};
-
-// Special tokenizer for JSON to handle the specific structure
-const tokenizeJson = (code: string): Token[] => {
-  const tokens: Token[] = [];
-  let currentPos = 0;
-  
-  // Helper to add a token
-  const addToken = (end: number, type: string) => {
-    if (end > currentPos) {
-      tokens.push({
-        type,
-        content: code.substring(currentPos, end)
-      });
-      currentPos = end;
-    }
-  };
-  
-  // Process the JSON character by character
-  while (currentPos < code.length) {
-    const char = code[currentPos];
-    
-    // Handle whitespace
-    if (/\s/.test(char)) {
-      const match = code.substring(currentPos).match(/^\s+/);
-      if (match) {
-        addToken(currentPos + match[0].length, 'plain');
-        continue;
-      }
-    }
-    
-    // Handle strings (property names and values)
-    if (char === '"') {
-      // Find the end of the string
-      let endPos = currentPos + 1;
-      let escaped = false;
-      
-      while (endPos < code.length) {
-        if (code[endPos] === '"' && !escaped) {
-          break;
-        }
-        escaped = code[endPos] === '\\' && !escaped;
-        endPos++;
-      }
-      
-      if (endPos < code.length) {
-        endPos++; // Include the closing quote
-        
-        // Check if this is a property name (followed by colon)
-        let isPropertyName = false;
-        let colonPos = endPos;
-        
-        // Look ahead for a colon
-        while (colonPos < code.length && /\s/.test(code[colonPos])) {
-          colonPos++;
-        }
-        
-        if (colonPos < code.length && code[colonPos] === ':') {
-          isPropertyName = true;
-        }
-        
-        addToken(endPos, isPropertyName ? 'keyword' : 'string');
-        continue;
-      }
-    }
-    
-    // Handle numbers
-    if (/[\d-]/.test(char)) {
-      const match = code.substring(currentPos).match(/^-?\d+(\.\d+)?([eE][+-]?\d+)?/);
-      if (match) {
-        addToken(currentPos + match[0].length, 'number');
-        continue;
-      }
-    }
-    
-    // Handle true, false, null
-    if (/[tfn]/.test(char)) {
-      const literals = ['true', 'false', 'null'];
-      let found = false;
-      
-      for (const literal of literals) {
-        if (code.substring(currentPos, currentPos + literal.length) === literal) {
-          addToken(currentPos + literal.length, 'builtin');
-          found = true;
-          break;
-        }
-      }
-      
-      if (found) continue;
-    }
-    
-    // Handle other characters (braces, brackets, commas, colons)
-    addToken(currentPos + 1, 'plain');
-  }
-  
-  return tokens;
-};
-
-// Detect language from code
-const detectLanguage = (code: string): string => {
-  // Simple detection logic
-  if (code.includes('import React') || code.includes('export interface') || code.includes(': string')) {
-    return 'typescript';
-  }
-  if (code.includes('<div') || code.includes('<span') || code.includes('</')) {
-    return 'html';
-  }
-  if (code.includes('function') || code.includes('const ') || code.includes('let ')) {
-    return 'javascript';
-  }
-  return 'plaintext';
-};
+import { DisplayCodeProps } from '../types';
+import { tokenize, splitTokensByLines } from '../utils/tokenizer';
+import { detectLanguage } from '../utils/syntax-highlighter';
+import { copyToClipboard, getLanguageIcon } from '../utils';
 
 // Main component
 export const DisplayCode: React.FC<DisplayCodeProps> = ({
   code,
   language,
+  languages: customLanguages,
   theme = 'light',
   showLineNumbers = false,
   showCopyButton = true,
@@ -309,11 +31,11 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
     if (theme === 'auto') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       setActualTheme(mediaQuery.matches ? 'dark' : 'light');
-      
+
       const handleChange = (e: MediaQueryListEvent) => {
         setActualTheme(e.matches ? 'dark' : 'light');
       };
-      
+
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     } else {
@@ -322,24 +44,24 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
   }, [theme]);
 
   const detectedLanguage = useMemo(() => {
-    return (language || detectLanguage(code)) as SupportedLanguage;
+    return (language || detectLanguage(code)) as string;
   }, [code, language]);
 
-  const processedCode = useMemo(() => {
+  // Tokenize the full code (handles multi-line constructs), then split into lines.
+  const processedLines = useMemo(() => {
     const normalizedCode = code.replace(/\t/g, ' '.repeat(tabSize));
-    const lines = normalizedCode.split('\n');
-    
-    return lines.map((line: string, index: number) => {
+    const tokens = tokenize(normalizedCode, detectedLanguage, customLanguages);
+    const tokenLines = splitTokensByLines(tokens);
+
+    return tokenLines.map((lineTokens, index) => {
       const lineNumber = index + startLineNumber;
-      const isHighlighted = highlightLines.includes(lineNumber);
-      
       return {
-        content: line,
-        highlighted: isHighlighted,
+        tokens: lineTokens,
+        highlighted: highlightLines.includes(lineNumber),
         lineNumber
       };
     });
-  }, [code, tabSize, startLineNumber, highlightLines]);
+  }, [code, tabSize, startLineNumber, highlightLines, detectedLanguage, customLanguages]);
 
   const handleCopy = async () => {
     const success = await copyToClipboard(code);
@@ -351,7 +73,7 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
   };
 
   const isDark = actualTheme === 'dark';
-  
+
   // Inline styles for the component
   const styles = {
     container: {
@@ -359,8 +81,8 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
       borderRadius: '8px',
       overflow: 'hidden',
       margin: '1rem 0',
-      boxShadow: isDark 
-        ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
+      boxShadow: isDark
+        ? '0 2px 8px rgba(0, 0, 0, 0.3)'
         : '0 2px 8px rgba(0, 0, 0, 0.1)',
       backgroundColor: isDark ? '#1a202c' : '#ffffff',
       color: isDark ? '#e2e8f0' : '#1a202c',
@@ -398,11 +120,11 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
       border: 'none',
       fontSize: '0.75rem',
       fontWeight: 500,
-      backgroundColor: copied 
-        ? (isDark ? '#276749' : '#c6f6d5') 
+      backgroundColor: copied
+        ? (isDark ? '#276749' : '#c6f6d5')
         : (isDark ? '#4a5568' : '#e9ecef'),
-      color: copied 
-        ? (isDark ? '#c6f6d5' : '#276749') 
+      color: copied
+        ? (isDark ? '#c6f6d5' : '#276749')
         : (isDark ? '#e2e8f0' : '#1a202c'),
       cursor: 'pointer',
       transition: 'background-color 0.2s'
@@ -457,17 +179,36 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
     }
   };
 
-  // CSS for syntax highlighting
+  // CSS for syntax highlighting – covers every token type produced by the
+  // unified tokenizer. Uses `highlight-*` class names that match the CSS Module
+  // and the `highlightCode` utility, ensuring a stable token-class contract.
   const syntaxStyles = `
-    .comment { color: ${isDark ? '#718096' : '#718096'}; font-style: italic; }
-    .keyword { color: ${isDark ? '#63b3ed' : '#3182ce'}; font-weight: bold; }
-    .builtin { color: ${isDark ? '#f6ad55' : '#dd6b20'}; }
-    .string { color: ${isDark ? '#68d391' : '#38a169'}; }
-    .number { color: ${isDark ? '#f6ad55' : '#dd6b20'}; }
+    .highlight-comment { color: ${isDark ? '#a0aec0' : '#6c757d'}; font-style: italic; }
+    .highlight-keyword { color: ${isDark ? '#63b3ed' : '#0d6efd'}; font-weight: 600; }
+    .highlight-boolean { color: ${isDark ? '#b794f6' : '#6f42c1'}; }
+    .highlight-string { color: ${isDark ? '#f687b3' : '#d63384'}; }
+    .highlight-number { color: ${isDark ? '#f093fb' : '#e83e8c'}; }
+    .highlight-function { color: ${isDark ? '#fc8181' : '#dc3545'}; }
+    .highlight-class-name { color: ${isDark ? '#f6ad55' : '#fd7e14'}; }
+    .highlight-tag { color: ${isDark ? '#68d391' : '#198754'}; }
+    .highlight-key { color: ${isDark ? '#63b3ed' : '#0d6efd'}; }
+    .highlight-property { color: ${isDark ? '#b794f6' : '#6f42c1'}; }
+    .highlight-selector { color: ${isDark ? '#68d391' : '#198754'}; }
+    .highlight-color { color: ${isDark ? '#f093fb' : '#e83e8c'}; }
+    .highlight-variable { color: ${isDark ? '#f6ad55' : '#fd7e14'}; }
+    .highlight-header { color: ${isDark ? '#63b3ed' : '#0d6efd'}; font-weight: 600; }
+    .highlight-bold { font-weight: 600; }
+    .highlight-italic { font-style: italic; }
+    .highlight-code { background: ${isDark ? '#2d3748' : '#f8f9fa'}; padding: 0.125rem 0.25rem; border-radius: 3px; }
+    .highlight-code-block { background: ${isDark ? '#2d3748' : '#f8f9fa'}; padding: 0.5rem; border-radius: 4px; display: block; margin: 0.5rem 0; }
+    .highlight-link { color: ${isDark ? '#63b3ed' : '#0d6efd'}; text-decoration: underline; }
+    .highlight-processing-instruction { color: ${isDark ? '#a0aec0' : '#6c757d'}; font-style: italic; }
+    .highlight-operator { color: ${isDark ? '#e2e8f0' : '#495057'}; }
+    .highlight-punctuation { color: ${isDark ? '#e2e8f0' : '#495057'}; }
   `;
 
   return (
-    <div style={{...styles.container, ...(className ? { className } : {})}}>
+    <div style={styles.container} className={className || undefined}>
       <style>{syntaxStyles}</style>
       {(title || showLanguageLabel || showCopyButton) && (
         <div style={styles.header}>
@@ -507,7 +248,7 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
       <div style={styles.codeWrapper}>
         {showLineNumbers && (
           <div style={styles.lineNumbers}>
-            {processedCode.map((line, index) => (
+            {processedLines.map((line, index) => (
               <span key={`ln-${index}`} style={styles.lineNumber}>
                 {line.lineNumber}
               </span>
@@ -516,7 +257,7 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
         )}
         <pre style={styles.pre}>
           <code>
-            {processedCode.map((line, index) => (
+            {processedLines.map((line, index) => (
               <div
                 key={index}
                 style={{
@@ -524,11 +265,18 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
                   ...(line.highlighted ? styles.lineHighlight : {})
                 }}
               >
-                {tokenizeCode(line.content || ' ', detectedLanguage).map((token, tokenIndex) => (
-                  <span key={tokenIndex} className={token.type !== 'plain' ? token.type : undefined}>
-                    {token.content}
-                  </span>
-                ))}
+                {line.tokens.length > 0 ? (
+                  line.tokens.map((token, tokenIndex) => (
+                    <span
+                      key={tokenIndex}
+                      className={token.type !== 'plain' ? `highlight-${token.type}` : undefined}
+                    >
+                      {token.content}
+                    </span>
+                  ))
+                ) : (
+                  ' '
+                )}
               </div>
             ))}
           </code>

@@ -1,52 +1,50 @@
-import { languages } from './syntax-highlighter';
-import { SupportedLanguage } from '../types';
+import { SupportedLanguage, LanguageDefinition } from '../types';
+import { tokenize } from './tokenizer';
 
-export const highlightCode = (code: string, language: SupportedLanguage): string => {
-  if (language === 'plaintext') {
-    return escapeHtml(code);
-  }
+export { tokenize, splitTokensByLines } from './tokenizer';
 
-  const lang = languages[language];
-  if (!lang) {
-    return escapeHtml(code);
-  }
-
-  // First escape the entire code to ensure HTML tags are displayed as text
-  let highlightedCode = escapeHtml(code);
-
-  // Apply syntax highlighting rules in order
-  for (const rule of lang.rules) {
-    // Use a non-greedy regex replacement approach to avoid nested replacements
-    // This prevents the 'class=class=' issue
-    let lastHighlightedCode = '';
-    while (lastHighlightedCode !== highlightedCode) {
-      lastHighlightedCode = highlightedCode;
-      
-      // Find the next match that's not inside a span
-      const regex = new RegExp(
-        `(?<!<span[^>]*>)(?:${rule.pattern.source})(?![^<]*</span>)`, 
-        rule.pattern.flags
-      );
-      
-      const match = regex.exec(highlightedCode);
-      if (!match) break;
-      
-      // Replace just this match
-      const before = highlightedCode.substring(0, match.index);
-      const after = highlightedCode.substring(match.index + match[0].length);
-      highlightedCode = `${before}<span class="highlight-${rule.className}">${match[0]}</span>${after}`;
-    }
-  }
-
-  return highlightedCode;
+/**
+ * Escapes HTML special characters in a string so that code can be safely
+ * embedded in `innerHTML` without executing embedded scripts.
+ *
+ * This is a **pure function** – it does not touch the DOM and is safe for
+ * server-side rendering.
+ */
+export const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 };
 
+/**
+ * Highlights source code and returns an HTML string with `<span>` wrappers.
+ *
+ * Uses the same unified tokenizer as the `DisplayCode` component, ensuring
+ * consistent output between the utility and the React component. Each token is
+ * HTML-escaped before being wrapped, so the output cannot inject executable
+ * HTML.
+ *
+ * @param code            The source code to highlight.
+ * @param language        Language identifier (built-in or custom).
+ * @param customLanguages Optional custom language definitions.
+ */
+export const highlightCode = (
+  code: string,
+  language: SupportedLanguage | string,
+  customLanguages?: Record<string, LanguageDefinition>
+): string => {
+  const tokens = tokenize(code, language, customLanguages);
 
-
-export const escapeHtml = (text: string): string => {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  return tokens
+    .map(token => {
+      const escaped = escapeHtml(token.content);
+      if (token.type === 'plain') return escaped;
+      return `<span class="highlight-${token.type}">${escaped}</span>`;
+    })
+    .join('');
 };
 
 export const copyToClipboard = async (text: string): Promise<boolean> => {
@@ -64,7 +62,7 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
-      
+
       const result = document.execCommand('copy');
       document.body.removeChild(textArea);
       return result;
@@ -75,25 +73,29 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
   }
 };
 
-export const getLanguageIcon = (language: SupportedLanguage): string => {
-  const icons: Record<SupportedLanguage, string> = {
-    javascript: '🟨',
-    typescript: '🔷',
-    jsx: '⚛️',
-    tsx: '⚛️',
-    html: '🌐',
-    css: '🎨',
-    json: '📄',
-    markdown: '📝',
-    bash: '💻',
-    python: '🐍',
-    java: '☕',
-    cpp: '⚙️',
-    sql: '🗃️',
-    yaml: '📋',
-    xml: '📊',
-    plaintext: '📄'
-  };
-  
-  return icons[language] || '📄';
+const languageIcons: Record<string, string> = {
+  javascript: '🟨',
+  typescript: '🔷',
+  jsx: '⚛️',
+  tsx: '⚛️',
+  html: '🌐',
+  css: '🎨',
+  json: '📄',
+  markdown: '📝',
+  bash: '💻',
+  python: '🐍',
+  java: '☕',
+  cpp: '⚙️',
+  sql: '🗃️',
+  yaml: '📋',
+  xml: '📊',
+  plaintext: '📄',
+};
+
+/**
+ * Returns an emoji icon for a language. Accepts any string so that custom
+ * languages are handled gracefully (returns a default icon for unknowns).
+ */
+export const getLanguageIcon = (language: string): string => {
+  return languageIcons[language.toLowerCase()] || '📄';
 };

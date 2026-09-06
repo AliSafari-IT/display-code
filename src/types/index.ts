@@ -1,6 +1,8 @@
 export interface DisplayCodeProps {
   code: string;
   language?: string;
+  /** Custom language definitions that extend or override built-in languages. */
+  languages?: Record<string, LanguageDefinition>;
   theme?: 'light' | 'dark' | 'auto';
   showLineNumbers?: boolean;
   showCopyButton?: boolean;
@@ -14,6 +16,12 @@ export interface DisplayCodeProps {
   startLineNumber?: number;
   tabSize?: number;
   showLanguageLabel?: boolean;
+}
+
+/** A single token produced by the tokenizer. `type` is `'plain'` for unstyled text. */
+export interface Token {
+  type: string;
+  content: string;
 }
 
 export type SupportedLanguage = 
