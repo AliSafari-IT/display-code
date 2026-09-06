@@ -1,8 +1,10 @@
 import { useState } from "react";
-// Use our professional DisplayCodeDemo component
+import { Routes, Route } from "react-router-dom";
 import { DisplayCode } from "@asafarim/display-code";
-import { PackageLinks } from "@asafarim/shared";
-import { useTheme, ThemeToggle } from "@asafarim/react-themes";
+import { useTheme } from "@asafarim/react-themes";
+import { SiteNav } from "./SiteNav";
+import { RoadmapPage } from "./RoadmapPage";
+import { HowToPage } from "./HowToPage";
 
 const codeExamples = {
   javascript: `// JavaScript Example
@@ -458,8 +460,8 @@ main() {
 main "\$@"`,
 };
 
-function App() {
-  const { mode, currentTheme, toggleMode } = useTheme();
+function HomePage() {
+  const { currentTheme } = useTheme();
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [showLineNumbers, setShowLineNumbers] = useState(true);
@@ -469,23 +471,6 @@ function App() {
   );
   const [wrapLines, setWrapLines] = useState(false);
   const [maxHeight, setMaxHeight] = useState("400px");
-
-  // Toggle between light and dark theme
-  function toggleTheme() {
-    const html = document.documentElement;
-    const currentTheme = html.getAttribute("data-theme");
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    html.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-  }
-
-  // Check for saved theme preference
-  const savedTheme =
-    localStorage.getItem("theme") ||
-    (window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light");
-  document.documentElement.setAttribute("data-theme", savedTheme);
 
   const handleCopy = (code: string) => {
     console.log("Code copied:", code.length, "characters");
@@ -497,25 +482,6 @@ function App() {
         currentTheme.mode === "dark" ? "dark-theme" : ""
       }`}
     >
-      <div className="demo-header">
-        <div className="logo-container">
-          <img src="./logo.svg" alt="Display Code Logo" className="demo-logo" />
-        </div>
-        <h1>@asafarim/display-code</h1>
-        <p>Beautiful syntax-highlighted code blocks for React applications</p>
-
-        <PackageLinks
-          packageName="@asafarim/display-code"
-          githubPath="https://github.com/AliSafari-IT/display-code.git"
-          demoPath="display-code"
-        />
-        <br />
-        <div style={{display: "flex", alignItems: "center", gap: "1rem", justifyContent: "center"}}>
-          <p style={{margin: "0"}}>Theme Toggle:</p>
-          <ThemeToggle showLabels style={{border: "1px solid #ccc", background: "transparent", borderRadius: "5px", padding: "0.5rem", cursor: "pointer", transition: "background 0.3s ease"}}/>
-        </div>
-      </div>
-
       <div className="demo-section">
         <h2>🚀 Features</h2>
         <div className="features-list">
@@ -795,6 +761,20 @@ function greet(name) {
         </p>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <SiteNav />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/how-to" element={<HowToPage />} />
+        <Route path="/roadmap" element={<RoadmapPage />} />
+        <Route path="*" element={<HomePage />} />
+      </Routes>
+    </>
   );
 }
 

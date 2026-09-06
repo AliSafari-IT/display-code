@@ -81,6 +81,7 @@ export const DisplayCode: React.FC<DisplayCodeProps> = ({
       borderRadius: '8px',
       overflow: 'hidden',
       margin: '1rem 0',
+      maxWidth: '100%',
       boxShadow: isDark
         ? '0 2px 8px rgba(0, 0, 0, 0.3)'
         : '0 2px 8px rgba(0, 0, 0, 0.1)',

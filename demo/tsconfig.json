@@ -15,9 +15,8 @@
     "jsx": "react-jsx",
     
     /* Path resolution */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "@asafarim/display-code": ["../src"],
       "@asafarim/display-code/*": ["../src/*"]
     },

@@ -22,7 +22,7 @@ export default defineConfig(() => {
       port: 3003,
       open: true
     },
-    base: '/display-code/',
+    base: process.env.VITE_BASE_PATH || '/display-code/',
     build: {
       assetsInlineLimit: 0, // Ensure all assets are processed as files
       commonjsOptions: {
