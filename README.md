@@ -2,24 +2,17 @@
 
 A React component for displaying syntax-highlighted code blocks with copy functionality, theme support, and a unified tokenizer pipeline.
 
-![DisplayCode Home (Light)](demo/public/screenshot-home-light.png)
-
-![DisplayCode Home (Dark)](demo/public/screenshot-home-dark.png)
+![DisplayCode Demo and Usage Examples](demo/public/DisplayCode_Demo-and-Usage-Examples.png)
 
 ---
 
 ## Live Demo
 
-- **Home**: [alisafari-it.github.io/display-code/](https://alisafari-it.github.io/display-code/)
-- **How To**: [alisafari-it.github.io/display-code/how-to](https://alisafari-it.github.io/display-code/how-to)
-- **Roadmap**: [alisafari-it.github.io/display-code/roadmap](https://alisafari-it.github.io/display-code/roadmap)
+Experience the full interactive demo at **[alisafari-it.github.io/display-code/](https://alisafari-it.github.io/display-code/)** — including:
 
-Run the demo locally:
-
-```bash
-pnpm install
-pnpm demo
-```
+- **Home** — Feature overview with live code examples
+- **How To** — Complete usage guide with every prop demonstrated, source code reveal, and copy buttons
+- **Roadmap** — Changelog and future plans with GitHub issue integration
 
 ---
 
@@ -217,26 +210,6 @@ Light, dark, and auto (system preference) themes:
   startLineNumber={42}
 />
 ```
-
----
-
-## How To Page
-
-![HowTo Page (Light)](demo/public/screenshot-howto-light.png)
-
-The [How To page](https://alisafari-it.github.io/display-code/how-to) demonstrates every prop with live examples. Each example has an **eye icon** button to reveal the source code that produced it, and a **copy** button to copy the snippet.
-
-![HowTo Source Revealed](demo/public/screenshot-howto-source-revealed.png)
-
----
-
-## Roadmap
-
-![Roadmap Page (Light)](demo/public/screenshot-roadmap-light.png)
-
-The [Roadmap page](https://alisafari-it.github.io/display-code/roadmap) shows the project's changelog and future plans, with GitHub issue integration for voting and discussion.
-
-![Roadmap Expanded](demo/public/screenshot-roadmap-expanded.png)
 
 ---
 
