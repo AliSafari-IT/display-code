@@ -43,8 +43,8 @@ importers:
   demo:
     dependencies:
       '@asafarim/display-code':
-        specifier: file:../
-        version: file:(react-dom@18.3.1)(react@18.3.1)
+        specifier: workspace:*
+        version: link:..
       '@asafarim/shared':
         specifier: ^1.7.4
         version: 1.7.4(react-dom@18.3.1)(react@18.3.1)
@@ -2036,15 +2036,3 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
     dev: true
-
-  file:(react-dom@18.3.1)(react@18.3.1):
-    resolution: {directory: '', type: directory}
-    id: 'file:'
-    name: '@asafarim/display-code'
-    peerDependencies:
-      react: ^17.0.0 || ^18.0.0
-      react-dom: ^17.0.0 || ^18.0.0
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    dev: false
