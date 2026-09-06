@@ -41,7 +41,7 @@ function CopyIcon({ copied }: { copied: boolean }) {
 
 // ─── Source code reveal card ──────────────────────────────────────────────
 
-function SourceReveal({ code }: { code: string }) {
+function SourceReveal({ code, isDark }: { code: string; isDark: boolean }) {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,7 +84,7 @@ function SourceReveal({ code }: { code: string }) {
           <DisplayCode
             code={code}
             language="tsx"
-            theme="auto"
+            theme={isDark ? "dark" : "light"}
             showLineNumbers={true}
             showCopyButton={false}
             fontSize="small"
@@ -125,7 +125,7 @@ function UseCaseCard({ useCase, isDark }: { useCase: UseCase; isDark: boolean })
           {...useCase.demoProps}
         />
       </div>
-      <SourceReveal code={useCase.code} />
+      <SourceReveal code={useCase.code} isDark={isDark} />
     </div>
   );
 }
@@ -188,6 +188,7 @@ function InstallSection({ isDark }: { isDark: boolean }) {
         </div>
         <p className="howto-card__desc">Import the component and its styles, then use it anywhere.</p>
         <SourceReveal
+          isDark={isDark}
           code={`import { DisplayCode } from '@asafarim/display-code';
 
 function App() {
