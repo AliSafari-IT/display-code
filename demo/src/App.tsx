@@ -482,6 +482,13 @@ function HomePage() {
         currentTheme.mode === "dark" ? "dark-theme" : ""
       }`}
     >
+      <header className="demo-hero">
+        <h1 className="demo-hero__title">@asafarim/display-code</h1>
+        <p className="demo-hero__subtitle">
+          Beautiful syntax-highlighted code blocks for React applications
+        </p>
+      </header>
+
       <div className="demo-section">
         <h2>🚀 Features</h2>
         <div className="features-list">

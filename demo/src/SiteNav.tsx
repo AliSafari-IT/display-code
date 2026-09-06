@@ -21,7 +21,24 @@ export function SiteNav() {
   return (
     <nav className={`site-nav${isDark ? " site-nav--dark" : ""}`}>
       <Link to="/" className="site-nav__brand" aria-label="Home">
-        <span className="site-nav__logo">{"</>"}</span>
+        <svg
+          className="site-nav__logo"
+          viewBox="0 0 24 24"
+          width="32"
+          height="32"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="logo-bg" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stopColor="#0d9488" />
+              <stop offset="1" stopColor="#7c3aed" />
+            </linearGradient>
+          </defs>
+          <rect width="24" height="24" rx="5" fill="url(#logo-bg)" />
+          <path d="M7 8L10 12L7 16" stroke="#5eead4" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M17 8L14 12L17 16" stroke="#fbbf24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="12" y1="7" x2="12" y2="17" stroke="#f472b6" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+        </svg>
         <span className="site-nav__name">@asafarim/display-code</span>
       </Link>
 

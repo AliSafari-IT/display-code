@@ -21,6 +21,36 @@ body {
   padding: 2rem 2.5rem;
 }
 
+/* ── Hero section ─────────────────────────────────────────── */
+.demo-hero {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  margin-bottom: 1rem;
+}
+.demo-hero__title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+  background: linear-gradient(135deg, #0d9488, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.demo-hero__subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #4a5568;
+  margin: 0 0 1.5rem;
+  max-width: 50ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+.dark-theme .demo-hero__subtitle {
+  color: #a0aec0;
+}
+
 .demo-section {
   margin-bottom: 4rem;
   overflow: hidden;
@@ -264,12 +294,8 @@ body {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: #4299e1;
-  color: white;
-  font-family: ui-monospace, Consolas, monospace;
-  font-size: 0.8rem;
-  font-weight: 700;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 .site-nav__name {
   white-space: nowrap;

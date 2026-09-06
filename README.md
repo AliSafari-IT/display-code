@@ -1,48 +1,49 @@
 # @asafarim/display-code
 
-A React component for displaying syntax-highlighted code blocks with copy functionality and theme support.
+A React component for displaying syntax-highlighted code blocks with copy functionality, theme support, and a unified tokenizer pipeline.
 
-## 🚀 Demo
+![DisplayCode Home (Light)](demo/public/screenshot-home-light.png)
 
-![DisplayCode_Demo-and-Usage-Examples](demo/public/DisplayCode_Demo-and-Usage-Examples.png)
+![DisplayCode Home (Dark)](demo/public/screenshot-home-dark.png)
 
-Experience the full power of the DisplayCode component with our [interactive demo](https://alisafari-it.github.io/display-code/).
+---
 
-To run the demo locally:
+## Live Demo
+
+- **Home**: [alisafari-it.github.io/display-code/](https://alisafari-it.github.io/display-code/)
+- **How To**: [alisafari-it.github.io/display-code/how-to](https://alisafari-it.github.io/display-code/how-to)
+- **Roadmap**: [alisafari-it.github.io/display-code/roadmap](https://alisafari-it.github.io/display-code/roadmap)
+
+Run the demo locally:
 
 ```bash
-pnpm run demo
+pnpm install
+pnpm demo
 ```
 
-For more details about the demo, check out the [Demo README](demo/README.md).
+---
 
-The demo showcases:
-
-- 🌈 Syntax highlighting for multiple languages (JavaScript, TypeScript, JSON, Python, JSX, and more)
-- 🌓 Light/Dark/Auto theme switching
-- 📋 Copy to clipboard functionality
-- 🔢 Line numbers
-- 🎨 Customizable styling
-- 📱 Responsive design
-- ✨ Line highlighting
-
-## Installation
+## Install
 
 ```bash
 npm install @asafarim/display-code
+# or
+pnpm add @asafarim/display-code
+# or
+yarn add @asafarim/display-code
 ```
 
-## Usage
+---
+
+## Quick Start
 
 ```tsx
 import { DisplayCode } from '@asafarim/display-code';
 
-const MyComponent = () => {
+function App() {
   return (
     <DisplayCode
-      code={`function hello() {
-  console.log("Hello, World!");
-}`}
+      code="console.log('Hello, World!');"
       language="javascript"
       theme="light"
       showLineNumbers={true}
@@ -50,224 +51,298 @@ const MyComponent = () => {
       title="Hello World Example"
     />
   );
-};
+}
 ```
+
+---
+
+## Public API
+
+| Export | Kind | Notes |
+|---|---|---|
+| `DisplayCode` | Component | The main code display component |
+| `highlightCode` | Utility | Highlight code and return HTML string |
+| `tokenize` | Utility | Tokenize code into structured tokens |
+| `splitTokensByLines` | Utility | Split a token stream into per-line arrays |
+| `copyToClipboard` | Utility | Copy text to clipboard |
+| `getLanguageIcon` | Utility | Get emoji icon for a language |
+| `escapeHtml` | Utility | Pure HTML escaping (SSR-safe) |
+| `detectLanguage` | Utility | Auto-detect language from code content |
+| `languages` | Registry | Built-in language definitions |
+| `DisplayCodeProps` | Type | Props interface |
+| `SupportedLanguage` | Type | Union of built-in language IDs |
+| `LanguageDefinition` | Type | Custom language definition shape |
+| `HighlightRule` | Type | Single highlighting rule |
+| `Token` | Type | Token produced by the tokenizer |
+
+---
 
 ## Props
 
 | Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `code` | `string` | - | **Required**. The code to display |
-| `language` | `SupportedLanguage` | auto-detect | Programming language for syntax highlighting |
-| `theme` | `'light' \| 'dark' \| 'auto'` | `'light'` | Theme for the code block |
+|---|---|---|---|
+| `code` | `string` | — | **Required**. The code to display |
+| `language` | `string` | auto-detect | Language for syntax highlighting |
+| `languages` | `Record<string, LanguageDefinition>` | — | Custom language definitions |
+| `theme` | `'light' \| 'dark' \| 'auto'` | `'light'` | Color theme |
 | `showLineNumbers` | `boolean` | `false` | Show line numbers |
-| `showCopyButton` | `boolean` | `true` | Show copy to clipboard button |
-| `title` | `string` | - | Optional title for the code block |
-| `maxHeight` | `string` | `'500px'` | Maximum height of the code block |
-| `wrapLines` | `boolean` | `false` | Wrap long lines |
-| `className` | `string` | `''` | Additional CSS classes |
-| `onCopy` | `(code: string) => void` | - | Callback when code is copied |
+| `showCopyButton` | `boolean` | `true` | Show copy-to-clipboard button |
+| `title` | `string` | — | Header title for the code block |
+| `maxHeight` | `string` | `'500px'` | Max height before scrolling |
+| `wrapLines` | `boolean` | `false` | Wrap long lines instead of scrolling |
+| `className` | `string` | — | Custom CSS class for the container |
+| `onCopy` | `(code: string) => void` | — | Callback when code is copied |
 | `fontSize` | `'small' \| 'medium' \| 'large'` | `'medium'` | Font size |
-| `highlightLines` | `number[]` | `[]` | Array of line numbers to highlight |
+| `highlightLines` | `number[]` | `[]` | Line numbers to highlight |
 | `startLineNumber` | `number` | `1` | Starting line number |
 | `tabSize` | `number` | `2` | Tab size in spaces |
-| `showLanguageLabel` | `boolean` | `true` | Show language label |
+| `showLanguageLabel` | `boolean` | `true` | Show language badge in header |
+
+---
 
 ## Supported Languages
 
-The component supports syntax highlighting for:
+16 built-in languages with dedicated highlighting rules:
 
-- **JavaScript** (`.js`, `.mjs`)
-- **TypeScript** (`.ts`)
-- **JSX** (`.jsx`)
-- **TSX** (`.tsx`)
-- **HTML** (`.html`, `.htm`)
-- **CSS** (`.css`)
-- **JSON** (`.json`)
-- **Markdown** (`.md`, `.markdown`)
-- **Bash** (`.sh`, `.bash`)
-- **Python** (`.py`)
-- **Java** (`.java`)
-- **C++** (`.cpp`, `.cc`, `.cxx`, `.hpp`, `.h`)
-- **SQL** (`.sql`)
-- **YAML** (`.yaml`, `.yml`)
-- **XML** (`.xml`)
-- **Plain Text** (`.txt`)
+| Language | ID | Extensions |
+|---|---|---|
+| JavaScript | `javascript` | `.js`, `.mjs` |
+| TypeScript | `typescript` | `.ts` |
+| JSX | `jsx` | `.jsx` |
+| TSX | `tsx` | `.tsx` |
+| HTML | `html` | `.html`, `.htm` |
+| CSS | `css` | `.css` |
+| JSON | `json` | `.json` |
+| Markdown | `markdown` | `.md`, `.markdown` |
+| Bash | `bash` | `.sh`, `.bash` |
+| Python | `python` | `.py` |
+| Java | `java` | `.java` |
+| C++ | `cpp` | `.cpp`, `.cc`, `.cxx`, `.hpp`, `.h` |
+| SQL | `sql` | `.sql` |
+| YAML | `yaml` | `.yaml`, `.yml` |
+| XML | `xml` | `.xml` |
+| Plain Text | `plaintext` | `.txt` |
+
+Unknown language identifiers fall back to **plaintext** (not JavaScript).
+
+---
 
 ## Features
 
-### 🌈 Syntax Highlighting
+### Unified Tokenizer Pipeline
 
-Built-in syntax highlighting for 15+ programming languages with proper tokenization:
+Both `DisplayCode` and `highlightCode` share a single canonical tokenizer. This ensures consistent highlighting whether you render via the component or generate HTML strings.
 
 ```tsx
-<DisplayCode
-  code="const message = 'Hello, World!';"
-  language="javascript"
-/>
+import { tokenize, splitTokensByLines } from '@asafarim/display-code';
+
+const tokens = tokenize('const x = 1;', 'javascript');
+// → [{ type: 'keyword', content: 'const' }, { type: 'plain', content: ' ' }, ...]
+
+const lines = splitTokensByLines(tokens);
+// → [[{ type: 'keyword', content: 'const' }, ...]]
 ```
 
-### 🌓 Theme Support
+### Custom Language Definitions
 
-Support for light, dark, and auto (system preference) themes:
-
-```tsx
-<DisplayCode
-  code="print('Hello, World!')"
-  language="python"
-  theme="dark"
-/>
-```
-
-### 📋 Copy to Clipboard
-
-One-click copy functionality with visual feedback:
+Define your own languages without mutating the global registry:
 
 ```tsx
-<DisplayCode
-  code="npm install @asafarim/display-code"
-  language="bash"
-  showCopyButton={true}
-  onCopy={(code) => console.log('Copied:', code)}
-/>
-```
-
-### 🔢 Line Numbers
-
-Optional line numbers with customizable starting number:
-
-```tsx
-<DisplayCode
-  code="function example() {\n  return 'Hello';\n}"
-  language="javascript"
-  showLineNumbers={true}
-  startLineNumber={10}
-/>
-```
-
-### 🎨 Line Highlighting
-
-Highlight specific lines to draw attention:
-
-```tsx
-<DisplayCode
-  code="line 1\nline 2\nline 3"
-  language="plaintext"
-  highlightLines={[2]}
-/>
-```
-
-### 📱 Responsive Design
-
-Fully responsive with mobile-optimized styling:
-
-```tsx
-<DisplayCode
-  code="responsive code"
-  language="javascript"
-  wrapLines={true}
-  fontSize="small"
-/>
-```
-
-## Advanced Usage
-
-### Custom Styling
-
-```tsx
-<DisplayCode
-  code="const customized = true;"
-  language="javascript"
-  className="my-custom-code-block"
-  maxHeight="300px"
-  fontSize="large"
-/>
-```
-
-### Auto Language Detection
-
-```tsx
-<DisplayCode
-  code={`import React from 'react';
-export default function Component() {
-  return <div>Hello</div>;
-}`}
-  // language is auto-detected as 'tsx'
-/>
-```
-
-### Multi-line Code with Tabs
-
-```tsx
-<DisplayCode
-  code={`function example() {
-\tif (condition) {
-\t\treturn true;
-\t}
-}`}
-  language="javascript"
-  tabSize={4}
-  showLineNumbers={true}
-/>
-```
-
-## TypeScript Support
-
-Full TypeScript support with comprehensive type definitions:
-
-```tsx
-import { DisplayCode, DisplayCodeProps, SupportedLanguage } from '@asafarim/display-code';
-
-const props: DisplayCodeProps = {
-  code: 'const typescript = "awesome";',
-  language: 'typescript' as SupportedLanguage,
-  theme: 'dark',
-  showLineNumbers: true
+const graphqlDef: LanguageDefinition = {
+  name: 'GraphQL',
+  extensions: ['.graphql'],
+  keywords: ['type', 'query', 'mutation'],
+  rules: [
+    { pattern: /\b(type|query|mutation)\b/g, className: 'keyword' },
+    { pattern: /\b[A-Z][a-zA-Z0-9]*\b/g, className: 'class-name' },
+  ],
 };
 
-<DisplayCode {...props} />
+<DisplayCode
+  code="type User { name: String }"
+  language="graphql"
+  languages={{ graphql: graphqlDef }}
+/>
 ```
+
+### Multiline Constructs
+
+Block comments, template literals, and triple-quoted strings retain their token classification across rendered lines.
+
+### SSR-Safe
+
+`escapeHtml` and `tokenize` are pure functions with no `window` or `document` dependency. They work in Node.js for server-side rendering.
+
+### XSS Prevention
+
+All token content is HTML-escaped before rendering. Script tags and HTML in code input are displayed as text, never injected as executable markup.
+
+### Theme Support
+
+Light, dark, and auto (system preference) themes:
+
+```tsx
+<DisplayCode code={code} language="python" theme="dark" />
+```
+
+### Line Highlighting
+
+```tsx
+<DisplayCode
+  code={code}
+  language="javascript"
+  showLineNumbers={true}
+  highlightLines={[3, 4]}
+/>
+```
+
+### Copy to Clipboard
+
+```tsx
+<DisplayCode
+  code={code}
+  language="bash"
+  showCopyButton={true}
+  onCopy={(code) => console.log('Copied:', code.length, 'chars')}
+/>
+```
+
+### Line Numbers with Custom Start
+
+```tsx
+<DisplayCode
+  code={code}
+  language="javascript"
+  showLineNumbers={true}
+  startLineNumber={42}
+/>
+```
+
+---
+
+## How To Page
+
+![HowTo Page (Light)](demo/public/screenshot-howto-light.png)
+
+The [How To page](https://alisafari-it.github.io/display-code/how-to) demonstrates every prop with live examples. Each example has an **eye icon** button to reveal the source code that produced it, and a **copy** button to copy the snippet.
+
+![HowTo Source Revealed](demo/public/screenshot-howto-source-revealed.png)
+
+---
+
+## Roadmap
+
+![Roadmap Page (Light)](demo/public/screenshot-roadmap-light.png)
+
+The [Roadmap page](https://alisafari-it.github.io/display-code/roadmap) shows the project's changelog and future plans, with GitHub issue integration for voting and discussion.
+
+![Roadmap Expanded](demo/public/screenshot-roadmap-expanded.png)
+
+---
 
 ## Utility Functions
 
-The package also exports utility functions:
-
 ```tsx
-import { 
-  highlightCode, 
-  copyToClipboard, 
-  getLanguageIcon, 
-  detectLanguage 
+import {
+  highlightCode,
+  tokenize,
+  copyToClipboard,
+  getLanguageIcon,
+  escapeHtml,
+  detectLanguage,
+  languages,
 } from '@asafarim/display-code';
 
-// Highlight code manually
-const highlighted = highlightCode('const x = 1;', 'javascript');
+// Highlight code → HTML string
+const html = highlightCode('const x = 1;', 'javascript');
+
+// Tokenize → structured tokens
+const tokens = tokenize('const x = 1;', 'javascript');
 
 // Copy to clipboard
 await copyToClipboard('text to copy');
 
 // Get language icon
-const icon = getLanguageIcon('javascript'); // Returns '🟨'
+const icon = getLanguageIcon('javascript'); // '🟨'
 
-// Detect language
-const lang = detectLanguage('def hello(): pass'); // Returns 'python'
+// Escape HTML (pure, SSR-safe)
+const escaped = escapeHtml('<script>'); // '&lt;script&gt;'
+
+// Detect language from content
+const lang = detectLanguage('def hello(): pass'); // 'python'
+
+// Access the built-in language registry
+const jsDef = languages.javascript;
 ```
 
-## Styling
+---
 
-The component uses CSS Modules for styling. You can override styles by targeting the CSS classes:
+## TypeScript
 
-```css
-.my-custom-code-block {
-  border: 2px solid #0066cc;
-  border-radius: 12px;
-}
+Full TypeScript support with strict mode:
 
-.my-custom-code-block .highlight-keyword {
-  color: #ff6b6b;
-  font-weight: bold;
-}
+```tsx
+import { DisplayCode, DisplayCodeProps, SupportedLanguage } from '@asafarim/display-code';
+
+const props: DisplayCodeProps = {
+  code: 'const x = 1;',
+  language: 'typescript' as SupportedLanguage,
+  theme: 'dark',
+  showLineNumbers: true,
+};
 ```
+
+---
+
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build the library
+pnpm build
+
+# Run the demo dev server
+pnpm demo
+
+# Run tests
+pnpm test
+
+# Build the demo for production
+pnpm build && cd demo && pnpm build
+```
+
+### Project Structure
+
+```
+display-code/
+├── src/
+│   ├── components/
+│   │   └── DisplayCode.tsx       # Main component
+│   ├── utils/
+│   │   ├── tokenizer.ts          # Unified tokenizer
+│   │   ├── syntax-highlighter.ts # Language registry
+│   │   └── index.ts              # Utilities (escapeHtml, highlightCode, etc.)
+│   ├── types/
+│   │   └── index.ts              # Type definitions
+│   ├── __tests__/
+│   │   ├── tokenizer.test.ts     # Tokenizer tests (27 tests)
+│   │   └── highlightCode.test.ts # Utility tests (21 tests)
+│   └── index.ts                  # Public exports
+├── demo/
+│   ├── src/
+│   │   ├── App.tsx               # Home page + routing
+│   │   ├── HowToPage.tsx         # Usage guide with source reveal
+│   │   ├── RoadmapPage.tsx       # Changelog + roadmap with GitHub issues
+│   │   ├── SiteNav.tsx           # Navigation bar
+│   │   └── index.css             # Demo styles
+│   └── vite.config.ts
+├── rollup.config.js
+└── package.json
+```
+
+---
 
 ## Browser Support
 
@@ -276,45 +351,22 @@ The component uses CSS Modules for styling. You can override styles by targeting
 - Safari 12+
 - Edge 79+
 
-## Performance
-
-- Lazy syntax highlighting
-- Efficient re-rendering
-- Minimal bundle size
-- Optimized for large code blocks
+---
 
 ## License
 
 MIT
 
-## 🎯 Features
+---
 
-- **Syntax Highlighting**: 15+ languages with proper tokenization
-- **Theme Support**: Light, dark, and auto themes
-- **Copy Functionality**: One-click copy with visual feedback
-- **Line Numbers**: Optional line numbers with custom starting numbers
-- **Line Highlighting**: Highlight specific lines
-- **Responsive Design**: Mobile-optimized styling
-- **TypeScript Support**: Full type safety
-- **Auto Detection**: Automatic language detection
-- **Customizable**: Extensive styling options
-- **Performance**: Optimized for large code blocks
-
-## 🔧 Development
-
-To run the demo locally:
-
-```bash
-# Install dependencies
-npm install
-
-# Build the package
-npm run build
-
-# Start the demo
-npm run demo
-```
-
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## Roadmap Issues
+
+- [#1 – Unified syntax-highlighting pipeline](https://github.com/AliSafari-IT/display-code/issues/1) ✅
+- [#2 – Custom theme tokens and styling hooks](https://github.com/AliSafari-IT/display-code/issues/2)
+- [#3 – Interactive line selection and deep links](https://github.com/AliSafari-IT/display-code/issues/3)
+- [#4 – Virtualize large code blocks](https://github.com/AliSafari-IT/display-code/issues/4)
+- [#5 – Unified and split diff views](https://github.com/AliSafari-IT/display-code/issues/5)
